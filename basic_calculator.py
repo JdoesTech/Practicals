@@ -1,4 +1,4 @@
-def switch_option():
+def switch_option(a,b):
     option = int(input("Select your operation"))
     match option:
         case 1:
@@ -10,10 +10,11 @@ def switch_option():
         case 1:
             return (a/b)
         
-def operation(a,b):
+def operation():
     a = int(input("Add first number"))
     b = int(input("Add second number"))
-    switch_option
+    switch_option(a,b)
 
-        
+def main():
+    operation()
         
