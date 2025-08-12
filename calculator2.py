@@ -4,7 +4,7 @@ def operate():
     a= int(input("Enter first value : "))
     b= int(input("Enter second value : "))
     while True:
-        operand= input("Select operand")
+        operand= input("Select operand : ")
         if operand in operands_list:
             match operand:
                 case "+":
