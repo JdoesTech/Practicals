@@ -1,0 +1,103 @@
+Create a class representing anything you like (a Smartphone, Book, or even a Superhero!).
+Add attributes and methods to bring the class to life!
+Use constructors to initialize each object with unique values.
+Add an inheritance layer to explore polymorphism or encapsulation.
+
+Create a program that includes animals or vehicles with the same action (like move()). However, make each class define move() differently (for example, Car.move() prints "Driving" 🚗, while Plane.move() prints "Flying" ✈️).
+
+
+class language:
+	def __init__(self, root, continent, difficulty):
+		self.root = root
+		self.continent= continent
+		self.difficulty = difficulty
+	def printroot():
+		print("The original language is " + self.root)
+
+class Spanish(language):
+	def __init__(self, root, continent, difficulty):
+    		super().__init__(root, continent, difficulty)
+
+
+class Language:
+    def __init__(self, root, continent, difficulty):
+        self.root = root
+        self.continent = continent
+        self.__difficulty = difficulty   # encapsulated (private) attribute
+
+    def print_root(self):
+        print("The original language is " + self.root)
+
+    def get_difficulty(self):   # getter for encapsulated attribute
+        return self.__difficulty
+
+    def set_difficulty(self, new_difficulty):  # setter for encapsulated attribute
+        self.__difficulty = new_difficulty
+
+    def description(self):   # polymorphic method
+        return f"{self.root}-based language, common in {self.continent}, difficulty: {self.__difficulty}"
+
+
+class Spanish(Language):   # inheritance
+    def __init__(self, root, continent, difficulty, speakers):
+        super().__init__(root, continent, difficulty)
+        self.speakers = speakers
+
+    # overriding description (polymorphism)
+    def description(self):
+        return f"Spanish, a {self.root}-based language, spoken widely in {self.continent} by {self.speakers} million people."
+
+
+# Example usage
+lang = Language("Latin", "Europe", "Medium")
+spanish = Spanish("Latin", "South America & Europe", "Easy", 480)
+
+lang.print_root()
+print(lang.description())
+print(spanish.description())
+
+# Encapsulation demo
+print("Old difficulty:", lang.get_difficulty())
+lang.set_difficulty("Hard")
+print("New difficulty:", lang.get_difficulty())
+
+
+class Animal:
+    def move(self):
+        print("This animal moves in some way.")
+
+class Dog(Animal):
+    def move(self):
+        print("Running 🐕")
+
+class Fish(Animal):
+    def move(self):
+        print("Swimming 🐟")
+
+class Bird(Animal):
+    def move(self):
+        print("Flying 🐦")
+
+
+class Vehicle:
+    def move(self):
+        print("This vehicle moves somehow.")
+
+class Car(Vehicle):
+    def move(self):
+        print("Driving 🚗")
+
+class Plane(Vehicle):
+    def move(self):
+        print("Flying ✈️")
+
+class Boat(Vehicle):
+    def move(self):
+        print("Sailing 🚤")
+
+
+# Demonstration of polymorphism
+things = [Dog(), Fish(), Bird(), Car(), Plane(), Boat()]
+
+for thing in things:
+    thing.move()
