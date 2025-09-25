@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import urllib
+import requests
 
 df=pd.read_csv('cord_sample.csv')
 df.info()
@@ -13,7 +13,7 @@ df.duplicated().sum()
 df["publish_time"]=pd.to_datetime(df['publish_time'])
 df=df.drop(columns=["who_covidence_id","arxiv_id", "s2_id"])
 df=df.drop_duplicates()
-df=df.dropna(subset=["sha","cord_uid"])
+df=df.dropna(subset=["sha","cord_uid"], inplace=True)
 df=df.fillna("missing")
 df=df.reset_index(drop=True)
 
@@ -25,12 +25,22 @@ plt.figure(figsize=(10, 6))
     #first declare a new column for the counted lines
 df["line_count"]=None
 count=0
-for index, row in df.iterrows(10):
-    with webbrowser.open(df["url"]) as f:
-        for line in f:
-            count +=1
-        print(count)
-    df.at[index, "line_count"]=count
+
+for index, rows in df.iterrows():
+	url = rows["url"]
+	try:
+		with open("url", 'r')  as f:
+			lines=f.readlines()
+		print(f"{len(lines)} lines from this journal. ")
+		response= requests.get(url)
+		if response.status_code ==200:
+			count = len(response.text.splitlines())
+			df.at[index, "line_count"] =count
+		else:
+			df.at[index, "line_count"]=0
+	except:
+		df.at[index, "line_count"]=0
+
 
 line_ranking=df["line_count"].sort_values(ascending=False)
 #visualize
@@ -64,7 +74,7 @@ df["title"]=df["title"].astype(str)
 df["title"]=df["title"].str.replace('[^a-zA-Z0-9\'\]','', regex=True)
 df["title"]=df["title"].str.strip()
 all_words=df["title"].str.split().explode()
-frequ=allwords.value_counts()
+frequ=all_words.value_counts()
 #for index, row in df.iterrows():
     #frequ=df["title"].str.split().value_counts()
 frequ_plot=frequ.sort_values(ascending=False).head(10)
