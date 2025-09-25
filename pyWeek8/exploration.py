@@ -4,17 +4,17 @@ import seaborn as sns
 import requests
 
 df=pd.read_csv('cord_sample.csv')
-df.info()
-df.describe()
-df.head()
-df.isnull().sum()
-df.duplicated().sum()
+print(df.info())
+print(df.describe())
+print(df.head())
+print(df.isnull().sum())
+print(df.duplicated().sum())
 
 df["publish_time"]=pd.to_datetime(df['publish_time'])
-df=df.drop(columns=["who_covidence_id","arxiv_id", "s2_id"])
-df=df.drop_duplicates()
-df=df.dropna(subset=["sha","cord_uid"], inplace=True)
-df=df.fillna("missing")
+df.drop(columns=["who_covidence_id","arxiv_id", "s2_id"], inplace=True)
+df.drop_duplicates(inplace=True)
+df.dropna(subset=["sha","cord_uid"], inplace=True)
+df.fillna("missing", inplace=True)
 df=df.reset_index(drop=True)
 
 # Distribution of a numerical column
@@ -27,24 +27,22 @@ df["line_count"]=None
 count=0
 
 for index, rows in df.iterrows():
-	url = rows["url"]
-	try:
-		with open("url", 'r')  as f:
-			lines=f.readlines()
-		print(f"{len(lines)} lines from this journal. ")
-		response= requests.get(url)
-		if response.status_code ==200:
-			count = len(response.text.splitlines())
-			df.at[index, "line_count"] =count
-		else:
-			df.at[index, "line_count"]=0
-	except:
-		df.at[index, "line_count"]=0
+	url = rows.get("url", None)
+	if pd.notnull(url):
+		try:
+			response= requests.get(url)
+			if response.status_code ==200:
+				count = len(response.text.splitlines())
+				df.at[index, "line_count"] =count
+			else:
+				df.at[index, "line_count"]=0
+		except:
+			df.at[index, "line_count"]= "Not accessible"
 
 
-line_ranking=df["line_count"].sort_values(ascending=False)
+line_ranking=df.sort_values("line_count",ascending=False).head(10)
 #visualize
-sns.barplot(x="cord_uid", y="line_count", data=df, color="yellow")
+sns.barplot(x="cord_uid", y="line_count", data=line_ranking, color="yellow")
 plt.xticks(rotation=80)
 plt.xlabel("cord_uid")
 plt.ylabel("line_count")
@@ -52,8 +50,9 @@ plt.legend()
 plt.show()
 
 #Getting number of publications per year
-yearly_pub_num= df.groupby(df["publish_time"].dt.year).size()
-sns.lineplot(data=yearly_pub_num, y="line_count", color="red")
+yearly_pub_num= df.groupby(df["publish_time"].dt.year).size().reset_index()
+yearly_pub_num.columns = ["Year", "Number"]
+sns.lineplot(data=yearly_pub_num, y="Number", color="red")
 plt.xticks(rotation=80)
 plt.xlabel("Year")
 plt.ylabel("Number of Publications")
@@ -61,8 +60,9 @@ plt.legend()
 plt.show()
 
 #top journals churning research
-top_journals=df["journals"].value_counts()
-sns.barplot(data=top_journals, x=top_journals.index, y=top_journals.values, color="blue")
+top_journals=df["journal"].value_counts().reset_index()
+top_journals.columns = ["journal", "number"]
+sns.barplot(data=top_journals, x="category", y="journal", color="blue")
 plt.xticks(rotation=80)
 plt.xlabel("Journals")
 plt.ylabel("Number of Publications")
@@ -71,7 +71,7 @@ plt.show()
 
 #frequent words in titles
 df["title"]=df["title"].astype(str)
-df["title"]=df["title"].str.replace('[^a-zA-Z0-9\'\]','', regex=True)
+df["title"]=df["title"].str.replace('[^a-zA-Z0-9\']','', regex=True)
 df["title"]=df["title"].str.strip()
 all_words=df["title"].str.split().explode()
 frequ=all_words.value_counts()
@@ -82,10 +82,10 @@ most_used_word=frequ.max()
 sns.barplot(data=frequ_plot, x=frequ_plot.index, y=frequ_plot.values, color="green")
 
 #paper counts per source
-source_counts=df["source_x"].value_counts()
+source_counts=df["source_x"].value_counts().head(10)
 source_df=source_counts.reset_index()
-source_df.columns=["source", "index"]
-sns.barplot(data=source_df, x="source", y="count", color="purple")
+source_df.columns=["source", "count"]
+sns.barplot(data=source_counts, x="source", y="count", color="purple")
 plt.xticks(rotation=80)
 plt.xlabel("Source")
 plt.ylabel("Number of Publications")
