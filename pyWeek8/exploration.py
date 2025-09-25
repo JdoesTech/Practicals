@@ -13,10 +13,10 @@ print(df.isnull().sum())
 print(df.duplicated().sum())
 
 # Cleaning Data
-df["publish_time"]=pd.to_datetime(df['publish_time'])
+df["publish_time"]=pd.to_datetime(df['publish_time'], errors="coerce", format="mixed")
 df.drop(columns=["who_covidence_id","arxiv_id", "s2_id"], inplace=True)
 df.drop_duplicates(inplace=True)
-df.dropna(subset=["sha","cord_uid"], inplace=True)
+df.dropna(subset=["sha","cord_uid", "publish_time"], inplace=True)
 df.fillna("missing", inplace=True)
 df=df.reset_index(drop=True)
 
@@ -51,7 +51,6 @@ plt.xticks(rotation=80)
 plt.xlabel("cord_uid")
 plt.ylabel("line_count")
 plt.title("Top 10 Journals by lines")
-plt.legend()
 plt.show()
 
 #Getting number of publications per year
@@ -62,19 +61,17 @@ plt.xticks(rotation=80)
 plt.xlabel("Year")
 plt.ylabel("Number of Publications")
 plt.title("Number of Publications per Year")	
-plt.legend()
 plt.show()
 
 #top journals churning research
 top_journals=df["journal"].value_counts().reset_index()
 top_journals.columns = ["journal", "number"]
 # visualizing
-sns.barplot(data=top_journals, x="category", y="journal", color="blue")
+sns.barplot(data=top_journals, x="journal", y="number", color="blue")
 plt.xticks(rotation=80)
 plt.xlabel("Journals")
 plt.ylabel("Number of Publications")
 plt.title("Top Journals Churning Research")		
-plt.legend()
 plt.show()
 
 #frequent words in titles
@@ -91,7 +88,6 @@ plt.xticks(rotation=80)
 plt.xlabel("Words")
 plt.ylabel("Frequency")
 plt.title("Most Frequent Words in Titles")
-plt.legend()
 plt.show()
 
 #paper counts per source
@@ -99,11 +95,10 @@ source_counts=df["source_x"].value_counts().head(10)
 source_df=source_counts.reset_index()
 source_df.columns=["source", "count"]
 #visualizing
-sns.barplot(data=source_counts, x="source", y="count", color="purple")
+sns.barplot(data=source_df, x="source", y="count", color="purple")
 plt.xticks(rotation=80)
 plt.xlabel("Source")
 plt.ylabel("Number of Publications")
 plt.title("Top 10 Sources by Number of Publications")	
-plt.legend()
 plt.show()
     
