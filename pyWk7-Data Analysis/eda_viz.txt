@@ -22,7 +22,7 @@ df.boxplot(figsize=(20,10))
 df.select_dtypes(include='object')
 
 df["Phone Number"]=df["Phone Number"].str.replace("[^a-zA-Z0-9]","")
-df["Phone Number"]= df["Phone Number"].apply(lambda x: str(x)]
+df["Phone Number"]= df["Phone Number"].apply(lambda x: str(x))
 df["Phone Number"]= df["Phone Number"].apply(lambda x: x[0:3]+' '+[3:6]+' '+[6:])
 df["Phone Number"]= df["Phone Number"].str.replace["nan", '']
 df["Phone Number"]= df["Phone Number"].str.replace["Na", '']
