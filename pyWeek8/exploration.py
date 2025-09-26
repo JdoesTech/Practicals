@@ -17,7 +17,6 @@ df["publish_time"]=pd.to_datetime(df['publish_time'], errors="coerce", format="m
 df.drop(columns=["who_covidence_id","arxiv_id", "s2_id"], inplace=True)
 df.drop_duplicates(inplace=True)
 df.dropna(subset=["sha","cord_uid", "publish_time"], inplace=True)
-df.fillna("missing", inplace=True)
 df=df.reset_index(drop=True)
 
 # Distribution of a numerical column
@@ -56,7 +55,7 @@ plt.show()
 #Getting number of publications per year
 yearly_pub_num= df.groupby(df["publish_time"].dt.year).size().reset_index()
 yearly_pub_num.columns = ["Year", "Number"]
-sns.lineplot(data=yearly_pub_num, y="Number", color="red")
+sns.lineplot(data=yearly_pub_num, x="Year", y="Number", color="red")
 plt.xticks(rotation=80)
 plt.xlabel("Year")
 plt.ylabel("Number of Publications")
@@ -82,8 +81,12 @@ all_words=df["title"].str.split().explode()
 frequ=all_words.value_counts()
 frequ_plot=frequ.sort_values(ascending=False).head(10)
 most_used_word=frequ.max() #most used word count
+print(most_used_word)
+frequ_plot_df = frequ_plot.reset_index()
+frequ_plot_df.columns = ['word', 'Frequency']
+
 #visualizing
-sns.barplot(data=frequ_plot, x=frequ_plot.index, y=frequ_plot.values, color="green")
+sns.barplot(data=frequ_plot_df, x="word", y="Frequency", color="green")
 plt.xticks(rotation=80)
 plt.xlabel("Words")
 plt.ylabel("Frequency")
